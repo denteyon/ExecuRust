@@ -1,6 +1,6 @@
 extern crate nix;
 
-use nix::unistd::{fork, getpid, getppid, ForkResult};
+use nix::unistd::{fork, ForkResult};
 use std::io::{self, BufRead};
 use std::process::exit;
 use std::process::Command;
@@ -15,17 +15,16 @@ fn main() {
             .expect("there was no next line")
             .expect("the line could not be read");
 
-        for word in line.split_whitespace() {
-            println!("word '{}'", word);
-        }
+        let mut v: Vec<&str> = line.split(' ').collect();
+        let str: &str = v[0];
+        v.remove(0);
 
-        let child_pid = match fork() {
+        let _ = match fork() {
             Ok(ForkResult::Child) => {
-                println!(
-                    "[child] I'm alive! My PID is {} and PPID is {}.",
-                    getpid(),
-                    getppid()
-                );
+                Command::new(str)
+                    .args(&v)
+                    .spawn()
+                    .expect("command failed to start");
                 exit(0);
             }
 
