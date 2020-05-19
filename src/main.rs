@@ -26,10 +26,12 @@ fn main() {
             // child
             Ok(ForkResult::Child) => {
                 // exec
-                Command::new(str)
+                let mut child = Command::new(str)
                     .args(&v)
                     .spawn()
                     .expect("command failed to start");
+                let _result = child.wait();
+                println!();
                 exit(0);
             }
 
