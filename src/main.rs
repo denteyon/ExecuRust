@@ -1,12 +1,13 @@
 extern crate nix; //unix lib
 
 use nix::unistd::{fork, ForkResult};
-use std::io::{self, BufRead};
-use std::process::exit;
-use std::process::Command;
+use std::io::{self, BufRead, Write};
+use std::process::{exit, Command};
 
 fn main() {
     let stdin = io::stdin(); //input
+    print!("$: ");
+    let _ = io::stdout().flush(); // to print before reading
     loop {
         // infinite loop
         let line = stdin
@@ -31,12 +32,12 @@ fn main() {
                     .spawn()
                     .expect("command failed to start");
                 let _result = child.wait();
-                println!();
+                print!("$: ");
                 exit(0);
             }
 
             // parent
-            Ok(ForkResult::Parent { child, .. }) => {}
+            Ok(ForkResult::Parent { child: _, .. }) => {}
 
             //error
             Err(err) => {
